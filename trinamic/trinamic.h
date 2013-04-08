@@ -38,4 +38,6 @@ extern void TMC26XStepper_init(int number_of_steps, int cs_pin, int dir_pin,
 
 void TMC26XStepper_start(tos100 *tos100);
 void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100);
+void TMC26XStepper_setCurrent(unsigned int current, tos100 *tos100);
+void TMC26XStepper_setMicrosteps(int number_of_steps, tos100 *tos100);
 #endif

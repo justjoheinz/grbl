@@ -99,13 +99,13 @@ void TMC26XStepper_init(int number_of_steps, int cs_pin, int dir_pin, int step_p
   tos100->driver_configuration_register_value = DRIVER_CONFIG_REGISTER | READ_STALL_GUARD_READING;
 
   //set the current
-  setCurrent(current);
+  TMC26XStepper_setCurrent(current, tos100);
   //set to a conservative start value
-  setConstantOffTimeChopper(7, 54, 13,12,1);
+  TMC26XStepper_setConstantOffTimeChopper(7, 54, 13,12,1);
   //set a nice microstepping value
-  setMicrosteps(DEFAULT_MICROSTEPPING_VALUE);
+  TMC26XStepper_setMicrosteps(DEFAULT_MICROSTEPPING_VALUE, tos100);
   //save the number of steps
-  tos100->number_of_steps =   number_of_steps;
+  tos100->number_of_steps = number_of_steps;
 
   TMC26XStepper_start(tos100);
 }
@@ -181,3 +181,89 @@ void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100) {
   tos100->driver_status_result = i_datagram;
 }
 
+void TMC26XStepper_setCurrent(unsigned int current, tos100 *tos100) {
+  unsigned char current_scaling = 0;
+  //calculate the current scaling from the max current setting (in mA)
+  double mASetting = (double)current;
+  double resistor_value = (double) tos100->resistor;
+  // remove vesense flag
+  tos100->driver_configuration_register_value &= ~(VSENSE); 
+  //this is derrived from I=(cs+1)/32*(Vsense/Rsense)
+  //leading to cs = CS = 32*R*I/V (with V = 0,31V oder 0,165V  and I = 1000*current)
+  //with Rsense=0,15
+  //for vsense = 0,310V (VSENSE not set)
+  //or vsense = 0,165V (VSENSE set)
+  current_scaling = (unsigned char)((resistor_value*mASetting*32.0/(0.31*1000.0*1000.0))-0.5); //theoretically - 1.0 for better rounding it is 0.5
+        
+  //check if the current scalingis too low
+  if (current_scaling<16) {
+    //set the csense bit to get a use half the sense voltage (to support lower motor currents)
+    tos100->driver_configuration_register_value |= VSENSE;
+    //and recalculate the current setting
+    current_scaling = (unsigned char)((resistor_value*mASetting*32.0/(0.165*1000.0*1000.0))-0.5); //theoretically - 1.0 for better rounding it is 0.5
+  }
+
+  //do some sanity checks
+  if (current_scaling>31) {
+    current_scaling=31;
+  }
+  //delete the old value
+  tos100->stall_guard2_current_register_value &= ~(CURRENT_SCALING_PATTERN);
+  //set the new current scaling
+  tos100->stall_guard2_current_register_value |= current_scaling;
+  
+  TMC26XStepper_send262(tos100->driver_configuration_register_value, tos100);
+  TMC26XStepper_send262(tos100->stall_guard2_current_register_value, tos100);
+  
+}
+
+/*
+ * Set the number of microsteps per step.
+ * 0,2,4,8,16,32,64,128,256 is supported
+ * any value in between will be mapped to the next smaller value
+ * 0 and 1 set the motor in full step mode
+ */
+void TMC26XStepper_setMicrosteps(int number_of_steps, tos100 *tos100) {
+  long setting_pattern;
+  //poor mans log
+  if (number_of_steps>=256) {
+    setting_pattern=0;
+
+  } else if (number_of_steps>=128) {
+    setting_pattern=1;
+
+  } else if (number_of_steps>=64) {
+    setting_pattern=2;
+
+  } else if (number_of_steps>=32) {
+    setting_pattern=3;
+
+  } else if (number_of_steps>=16) {
+    setting_pattern=4;
+
+  } else if (number_of_steps>=8) {
+    setting_pattern=5;
+
+  } else if (number_of_steps>=4) {
+    setting_pattern=6;
+
+  } else if (number_of_steps>=2) {
+    setting_pattern=7;
+
+    //1 and 0 lead to full step
+  } else if (number_of_steps<=1) {
+    setting_pattern=8;
+
+  }
+
+  //delete the old value
+  tos100->driver_control_register_value &=0xFFFF0ul;
+  //set the new value
+  tos100->driver_control_register_value |=setting_pattern;
+        
+  
+  TMC26XStepper_send262(tos100->driver_control_register_value, tos100);
+  
+  //recalculate the stepping delay by simply setting the speed again
+    TMC26XStepper_setSpeed(tos100->speed, tos100);
+}
