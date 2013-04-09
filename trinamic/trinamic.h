@@ -23,7 +23,7 @@ typedef struct {
  
   // config stuff
   unsigned int resistor;
-
+  int constant_off_time;
 
   // probably not required
   unsigned int direction;
@@ -40,4 +40,10 @@ void TMC26XStepper_start(tos100 *tos100);
 void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100);
 void TMC26XStepper_setCurrent(unsigned int current, tos100 *tos100);
 void TMC26XStepper_setMicrosteps(int number_of_steps, tos100 *tos100);
+void TMC26XStepper_setConstantOffTimeChopper(char constant_off_time, 
+					     char blank_time, 
+					     char fast_decay_time_setting, 
+					     char sine_wave_offset, 
+					     unsigned char use_current_comparator, 
+					     tos100 *tos100);
 #endif

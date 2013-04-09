@@ -101,7 +101,7 @@ void TMC26XStepper_init(int number_of_steps, int cs_pin, int dir_pin, int step_p
   //set the current
   TMC26XStepper_setCurrent(current, tos100);
   //set to a conservative start value
-  TMC26XStepper_setConstantOffTimeChopper(7, 54, 13,12,1);
+  TMC26XStepper_setConstantOffTimeChopper(7, 54, 13,12,1, tos100);
   //set a nice microstepping value
   TMC26XStepper_setMicrosteps(DEFAULT_MICROSTEPPING_VALUE, tos100);
   //save the number of steps
@@ -116,13 +116,12 @@ void TMC26XStepper_init(int number_of_steps, int cs_pin, int dir_pin, int step_p
  */
 void TMC26XStepper_start(tos100 *tos100) {
   //set the pins as output & its initial value
-  pinMode(tos100->step_pin, OUTPUT);     
-  pinMode(tos100->dir_pin, OUTPUT);     
-  pinMode(tos100->cs_pin, OUTPUT);     
-  digitalWrite(tos100->step_pin, LOW);     
-  digitalWrite(tos100->dir_pin, LOW);     
-  digitalWrite(tos100->cs_pin, HIGH);   
-        
+  
+  // configure data direction bit and set pin to HIGH
+  DDRB |= _BV(tos100->cs_pin);
+  PORTB |= _BV(tos100->cs_pin);  
+  
+    
   //configure the SPI interface
   spi_setBitOrder(MSBFIRST);
   spi_setClockDivider(SPI_CLOCK_DIV8);
@@ -154,7 +153,7 @@ void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100) {
   }
         
   //select the TMC driver
-  digitalWrite(tos100->cs_pin,LOW);
+  PORTB &= ~_BV(tos100->cs_pin);
 
   //ensure that only valid bist are set (0-19)
   //datagram &=REGISTER_BIT_PATTERN;
@@ -168,8 +167,9 @@ void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100) {
   i_datagram >>= 4;
         
   //deselect the TMC chip
-  digitalWrite(tos100->cs_pin,HIGH); 
-    
+  //digitalWrite(tos100->cs_pin,HIGH); 
+  PORTB |= _BV(tos100->cs_pin);
+  
   //restore the previous SPI mode if neccessary
   //if the mode is not correct set it to mode 3
   if (oldMode != SPI_MODE3) {
@@ -263,7 +263,63 @@ void TMC26XStepper_setMicrosteps(int number_of_steps, tos100 *tos100) {
         
   
   TMC26XStepper_send262(tos100->driver_control_register_value, tos100);
-  
-  //recalculate the stepping delay by simply setting the speed again
-    TMC26XStepper_setSpeed(tos100->speed, tos100);
+}
+
+void TMC26XStepper_setConstantOffTimeChopper(char constant_off_time, char blank_time, char fast_decay_time_setting, char sine_wave_offset, unsigned char use_current_comparator, tos100 *tos100) {
+  //perform some sanity checks
+  if (constant_off_time<2) {
+    constant_off_time=2;
+  } else if (constant_off_time>15) {
+    constant_off_time=15;
+  }
+  //save the constant off time
+  tos100->constant_off_time = constant_off_time;
+  char blank_value;
+  //calculate the value acc to the clock cycles
+  if (blank_time>=54) {
+    blank_value=3;
+  } else if (blank_time>=36) {
+    blank_value=2;
+  } else if (blank_time>=24) {
+    blank_value=1;
+  } else {
+    blank_value=0;
+  }
+  if (fast_decay_time_setting<0) {
+    fast_decay_time_setting=0;
+  } else if (fast_decay_time_setting>15) {
+    fast_decay_time_setting=15;
+  }
+  if (sine_wave_offset < -3) {
+    sine_wave_offset = -3;
+  } else if (sine_wave_offset>12) {
+    sine_wave_offset = 12;
+  }
+  //shift the sine_wave_offset
+  sine_wave_offset +=3;
+        
+  //calculate the register setting
+  //first of all delete all the values for this
+  tos100->chopper_config_register &= ~((1<<12) | BLANK_TIMING_PATTERN | HYSTERESIS_DECREMENT_PATTERN | HYSTERESIS_LOW_VALUE_PATTERN | HYSTERESIS_START_VALUE_PATTERN | T_OFF_TIMING_PATERN);
+  //set the constant off pattern
+  tos100->chopper_config_register |= CHOPPER_MODE_T_OFF_FAST_DECAY;
+  //set the blank timing value
+  tos100->chopper_config_register |= ((unsigned long)blank_value) << BLANK_TIMING_SHIFT;
+  //setting the constant off time
+  tos100->chopper_config_register |= constant_off_time;
+  //set the fast decay time
+  //set msb
+  tos100->chopper_config_register |= (((unsigned long)(fast_decay_time_setting & 0x8))<<HYSTERESIS_DECREMENT_SHIFT);
+  //other bits
+  tos100->chopper_config_register |= (((unsigned long)(fast_decay_time_setting & 0x7))<<HYSTERESIS_START_VALUE_SHIFT);
+  //set the sine wave offset
+  tos100->chopper_config_register |= (unsigned long)sine_wave_offset << HYSTERESIS_LOW_SHIFT;
+  //using the current comparator?
+  if (!use_current_comparator) {
+    tos100->chopper_config_register |= (1<<12);
+  }
+
+  //if started we directly send it to the motor
+  TMC26XStepper_send262(tos100->driver_control_register_value, tos100);
+ 
 }
