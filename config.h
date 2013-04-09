@@ -25,7 +25,7 @@
 // IMPORTANT: Any changes here requires a full re-compiling of the source code to propagate them.
 
 // Default settings. Used when resetting EEPROM. Change to desired name in defaults.h
-#define DEFAULTS_GENERIC
+#define DEFAULTS_TRINAMIC
 
 // Serial baud rate
 #define BAUD_RATE 9600
@@ -40,6 +40,16 @@
 #define X_DIRECTION_BIT    5  // Uno Digital Pin 5
 #define Y_DIRECTION_BIT    6  // Uno Digital Pin 6
 #define Z_DIRECTION_BIT    7  // Uno Digital Pin 7
+
+#ifdef DEFAULTS_TRINAMIC
+	#define CS_DDR				DDRB
+	#define CS_PORT				PORTB
+	#define X_CS_BIT			0 // Uno Digital Pin 8
+	#define Y_CS_BIT			1 // Uno Digital Pin 9
+	#define Z_CS_BIT			2 // Uno Digital Pin 10
+	#define CS_MASK 			((1<<X_CS_BIT)|(1<<Y_CS_BIT)|(1<<Z_CS_BIT))
+#endif
+
 #define STEP_MASK ((1<<X_STEP_BIT)|(1<<Y_STEP_BIT)|(1<<Z_STEP_BIT)) // All step bits
 #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
 #define STEPPING_MASK (STEP_MASK | DIRECTION_MASK) // All stepping-related bits (step/direction)
