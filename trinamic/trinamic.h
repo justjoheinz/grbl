@@ -15,8 +15,8 @@ typedef struct {
             
   //the pins for the stepper driver
   unsigned char cs_pin;
-  unsigned char dir_pin;
-  unsigned char step_pin;
+  //unsigned char dir_pin;
+  //unsigned char step_pin;
                  
   //status values 
   int microsteps; //the current number of micro steps
@@ -32,8 +32,8 @@ typedef struct {
   bool cool_step_enabled;
 } tos100;
 
-extern void TMC26XStepper_init(int number_of_steps, int cs_pin, int dir_pin, 
-			       int step_pin, unsigned int current, 
+extern void TMC26XStepper_init(int number_of_steps, int cs_pin, 
+			       unsigned int current, 
 			       unsigned int resistor, tos100 *tos100);
 
 void TMC26XStepper_start(tos100 *tos100);

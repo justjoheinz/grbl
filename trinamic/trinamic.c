@@ -69,15 +69,13 @@
 //debuging output
 //#define DEBUG
 
-void TMC26XStepper_init(int number_of_steps, int cs_pin, int dir_pin, int step_pin, unsigned int current, unsigned int resistor, tos100 *tos100)
+void TMC26XStepper_init(int number_of_steps, int cs_pin,  unsigned int current, unsigned int resistor, tos100 *tos100)
 {
   //by default cool step is not enabled
   tos100->cool_step_enabled=false;
         
   //save the pins for later use
   tos100->cs_pin=cs_pin;
-  tos100->dir_pin=dir_pin;
-  tos100->step_pin = step_pin;
     
   //store the current sense resistor value for later use
   tos100->resistor = resistor;
