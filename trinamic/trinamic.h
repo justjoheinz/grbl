@@ -32,6 +32,9 @@ typedef struct {
   bool cool_step_enabled;
 } tos100;
 
+// Array of three structs to keep information about the steppers
+extern tos100 stepper_tos_100[3];
+
 extern void TMC26XStepper_init(int number_of_steps, int cs_pin, 
 			       unsigned int current, 
 			       unsigned int resistor, tos100 *tos100);

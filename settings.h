@@ -75,6 +75,9 @@ typedef struct {
   uint8_t decimal_places;
   uint8_t n_arc_correction;
 //  uint8_t status_report_mask; // Mask to indicate desired report data.
+  uint8_t trinamic_x;
+  uint8_t trinamic_y;
+  uint8_t trinamic_z;
 } settings_t;
 extern settings_t settings;
 

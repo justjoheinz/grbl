@@ -1,3 +1,4 @@
+#include <avr/io.h>
 #include "trinamic.h"
 #include "spi/spi.h"
 

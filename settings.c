@@ -95,6 +95,9 @@ void settings_reset(bool reset_all) {
   settings.stepper_idle_lock_time = DEFAULT_STEPPER_IDLE_LOCK_TIME;
   settings.decimal_places = DEFAULT_DECIMAL_PLACES;
   settings.n_arc_correction = DEFAULT_N_ARC_CORRECTION;
+  settings.trinamic_x = DEFAULT_TRINAMIC_X;
+  settings.trinamic_y = DEFAULT_TRINAMIC_Y;
+  settings.trinamic_z = DEFAULT_TRINAMIC_Z;
   write_global_settings();
 }
 
@@ -195,6 +198,9 @@ uint8_t settings_store_global_setting(int parameter, float value) {
     case 20: settings.homing_seek_rate = value; break;
     case 21: settings.homing_debounce_delay = round(value); break;
     case 22: settings.homing_pulloff = value; break;
+  case 23: settings.trinamic_x = value; break;
+  case 24: settings.trinamic_y = value; break;
+  case 25: settings.trinamic_z = value; break;
     default: 
       return(STATUS_INVALID_STATEMENT);
   }
