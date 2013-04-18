@@ -1,0 +1,3 @@
+[submodule "spi"]
+	path = spi
+	url = git://github.com/justjoheinz/spi_avr.git
