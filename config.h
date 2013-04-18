@@ -54,8 +54,8 @@
 #define DIRECTION_MASK ((1<<X_DIRECTION_BIT)|(1<<Y_DIRECTION_BIT)|(1<<Z_DIRECTION_BIT)) // All direction bits
 #define STEPPING_MASK (STEP_MASK | DIRECTION_MASK) // All stepping-related bits (step/direction)
 
-#define STEPPERS_DISABLE_DDR    DDRB
-#define STEPPERS_DISABLE_PORT   PORTB
+#define STEPPERS_DISABLE_DDR    DDRC
+#define STEPPERS_DISABLE_PORT   PORTC
 #define STEPPERS_DISABLE_BIT    0  // Uno Digital Pin 8
 #define STEPPERS_DISABLE_MASK (1<<STEPPERS_DISABLE_BIT)
 

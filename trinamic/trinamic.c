@@ -1,6 +1,11 @@
 #include <avr/io.h>
+#include "config.h"
 #include "trinamic.h"
 #include "spi/spi.h"
+
+// global variable to keep stepper information
+tos100 stepper_tos_100[3];
+
 
 //some default values used in initialization
 #define DEFAULT_MICROSTEPPING_VALUE 32
@@ -81,10 +86,6 @@ void TMC26XStepper_init(int number_of_steps, int cs_pin,  unsigned int current, 
   //store the current sense resistor value for later use
   tos100->resistor = resistor;
         
-  //initizalize our status values
-  tos100->steps_left = 0;
-  tos100->direction = 0;
-        
   //initialize register values
   tos100->driver_control_register_value=DRIVER_CONTROL_REGISTER | INITIAL_MICROSTEPPING;
   tos100->chopper_config_register=CHOPPER_CONFIG_REGISTER;
@@ -98,15 +99,19 @@ void TMC26XStepper_init(int number_of_steps, int cs_pin,  unsigned int current, 
   tos100->driver_configuration_register_value = DRIVER_CONFIG_REGISTER | READ_STALL_GUARD_READING;
 
   //set the current
-  TMC26XStepper_setCurrent(current, tos100);
+  //TMC26XStepper_setCurrent(current, tos100);
   //set to a conservative start value
-  TMC26XStepper_setConstantOffTimeChopper(7, 54, 13,12,1, tos100);
-  //set a nice microstepping value
-  TMC26XStepper_setMicrosteps(DEFAULT_MICROSTEPPING_VALUE, tos100);
+  //TMC26XStepper_setConstantOffTimeChopper(7, 54, 13,12,1, tos100);
+  //set a nice microstepping value, TOO: broken!
+  //TMC26XStepper_setMicrosteps(DEFAULT_MICROSTEPPING_VALUE, tos100);
+  
   //save the number of steps
   tos100->number_of_steps = number_of_steps;
 
-  TMC26XStepper_start(tos100);
+   TMC26XStepper_start(tos100);
+
+   // after setup set pin to HIGH again
+   CS_PORT |= _BV(tos100->cs_pin);
 }
 
 /*
@@ -117,8 +122,8 @@ void TMC26XStepper_start(tos100 *tos100) {
   //set the pins as output & its initial value
   
   // configure data direction bit and set pin to HIGH
-  DDRB |= _BV(tos100->cs_pin);
-  PORTB |= _BV(tos100->cs_pin);  
+  CS_DDR |= _BV(tos100->cs_pin);
+  CS_PORT |= _BV(tos100->cs_pin);  
   
     
   //configure the SPI interface
@@ -152,7 +157,8 @@ void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100) {
   }
         
   //select the TMC driver
-  PORTB &= ~_BV(tos100->cs_pin);
+  // set to LOW
+  CS_PORT &= ~_BV(tos100->cs_pin);
 
   //ensure that only valid bist are set (0-19)
   //datagram &=REGISTER_BIT_PATTERN;
@@ -166,8 +172,8 @@ void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100) {
   i_datagram >>= 4;
         
   //deselect the TMC chip
-  //digitalWrite(tos100->cs_pin,HIGH); 
-  PORTB |= _BV(tos100->cs_pin);
+  //set to HIGH 
+  CS_PORT |= _BV(tos100->cs_pin);
   
   //restore the previous SPI mode if neccessary
   //if the mode is not correct set it to mode 3

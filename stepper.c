@@ -27,6 +27,7 @@
 #include "config.h"
 #include "settings.h"
 #include "planner.h"
+#include "trinamic/trinamic.h"
 
 // Some useful constants
 #define TICKS_PER_MICROSECOND (F_CPU/1000000)
@@ -357,6 +358,10 @@ void st_init()
 #ifdef DEFAULTS_TRINAMIC
   // Configure Client Select Pins as output
   CS_DDR |= CS_MASK;
+  stepper_tos_100[0].cs_pin = 0;
+  stepper_tos_100[0].microsteps = 32;
+  stepper_tos_100[0].number_of_steps=200;
+  TMC26XStepper_init(200, 0, 800, 150, &stepper_tos_100[0]);
 #endif
 
   // waveform generation = 0100 = CTC

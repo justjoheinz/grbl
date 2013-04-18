@@ -26,9 +26,7 @@ typedef struct {
   int constant_off_time;
 
   // probably not required
-  unsigned int direction;
   unsigned int number_of_steps;
-  unsigned int steps_left;
   bool cool_step_enabled;
 } tos100;
 
