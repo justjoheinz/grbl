@@ -56,28 +56,28 @@
 
 #define STEPPERS_DISABLE_DDR    DDRC
 #define STEPPERS_DISABLE_PORT   PORTC
-#define STEPPERS_DISABLE_BIT    0  // Uno Digital Pin 8
+#define STEPPERS_DISABLE_BIT    0  // Analog Pin 0
 #define STEPPERS_DISABLE_MASK (1<<STEPPERS_DISABLE_BIT)
 
 // NOTE: All limit bit pins must be on the same port
-#define LIMIT_DDR       DDRB
-#define LIMIT_PIN       PINB
-#define LIMIT_PORT      PORTB
-#define X_LIMIT_BIT     1  // Uno Digital Pin 9
-#define Y_LIMIT_BIT     2  // Uno Digital Pin 10
-#define Z_LIMIT_BIT     3  // Uno Digital Pin 11
+#define LIMIT_DDR       DDRC
+#define LIMIT_PIN       PINC
+#define LIMIT_PORT      PORTC
+#define X_LIMIT_BIT     1  // Analog Pin 1
+#define Y_LIMIT_BIT     2  // Analog Pin 2
+#define Z_LIMIT_BIT     3  // Analog Pin 3
 #define LIMIT_INT       PCIE0  // Pin change interrupt enable pin
 #define LIMIT_INT_vect  PCINT0_vect 
 #define LIMIT_PCMSK     PCMSK0 // Pin change interrupt register
 #define LIMIT_MASK ((1<<X_LIMIT_BIT)|(1<<Y_LIMIT_BIT)|(1<<Z_LIMIT_BIT)) // All limit bits
 
-#define SPINDLE_ENABLE_DDR   DDRB
-#define SPINDLE_ENABLE_PORT  PORTB
-#define SPINDLE_ENABLE_BIT   4  // Uno Digital Pin 12
+#define SPINDLE_ENABLE_DDR   DDRC
+#define SPINDLE_ENABLE_PORT  PORTC
+#define SPINDLE_ENABLE_BIT   4  // Analog Pin 4
 
-#define SPINDLE_DIRECTION_DDR   DDRB
-#define SPINDLE_DIRECTION_PORT  PORTB
-#define SPINDLE_DIRECTION_BIT   5  // Uno Digital Pin 13 (NOTE: D13 can't be pulled-high input due to LED.)
+#define SPINDLE_DIRECTION_DDR   DDRC
+#define SPINDLE_DIRECTION_PORT  PORTC
+#define SPINDLE_DIRECTION_BIT   5  // Analog Pin 5
 
 #define COOLANT_FLOOD_DDR   DDRC
 #define COOLANT_FLOOD_PORT  PORTC
