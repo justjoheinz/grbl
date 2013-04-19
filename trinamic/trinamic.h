@@ -15,14 +15,13 @@ typedef struct {
             
   //the pins for the stepper driver
   unsigned char cs_pin;
-  //unsigned char dir_pin;
-  //unsigned char step_pin;
                  
   //status values 
   int microsteps; //the current number of micro steps
  
   // config stuff
   unsigned int resistor;
+  unsigned int current;
   int constant_off_time;
 
   // probably not required
@@ -33,13 +32,11 @@ typedef struct {
 // Array of three structs to keep information about the steppers
 extern tos100 stepper_tos_100[3];
 
-extern void TMC26XStepper_init(int number_of_steps, int cs_pin, 
-			       unsigned int current, 
-			       unsigned int resistor, tos100 *tos100);
+extern void TMC26XStepper_init(tos100 *tos100);
 
 void TMC26XStepper_start(tos100 *tos100);
 void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100);
-void TMC26XStepper_setCurrent(unsigned int current, tos100 *tos100);
+void TMC26XStepper_setCurrent(tos100 *tos100);
 void TMC26XStepper_setMicrosteps(int number_of_steps, tos100 *tos100);
 void TMC26XStepper_setConstantOffTimeChopper(char constant_off_time, 
 					     char blank_time, 

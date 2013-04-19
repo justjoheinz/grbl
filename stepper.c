@@ -358,10 +358,30 @@ void st_init()
 #ifdef DEFAULTS_TRINAMIC
   // Configure Client Select Pins as output
   CS_DDR |= CS_MASK;
-  stepper_tos_100[0].cs_pin = 0;
-  stepper_tos_100[0].microsteps = 32;
-  stepper_tos_100[0].number_of_steps=200;
-  TMC26XStepper_init(200, 0, 800, 150, &stepper_tos_100[0]);
+
+  // configure X stepper
+  stepper_tos_100[0].cs_pin = X_CS_BIT;
+  stepper_tos_100[0].microsteps = MICROSTEPS_XY;
+  stepper_tos_100[0].number_of_steps=STEP_REVS_XY;
+  stepper_tos_100[0].current = 800;
+  stepper_tos_100[0].resistor = 150;
+  TMC26XStepper_init( &stepper_tos_100[0]);
+
+  // configure Y stepper                                                        
+  stepper_tos_100[1].cs_pin = Y_CS_BIT;
+  stepper_tos_100[1].microsteps = MICROSTEPS_XY;
+  stepper_tos_100[1].number_of_steps=STEP_REVS_XY;
+  stepper_tos_100[1].current = 800;
+  stepper_tos_100[1].resistor = 150;
+  TMC26XStepper_init( &stepper_tos_100[1]);
+
+  // configure Z stepper                                                        
+  stepper_tos_100[2].cs_pin = Z_CS_BIT;
+  stepper_tos_100[2].microsteps = MICROSTEPS_Z;
+  stepper_tos_100[2].number_of_steps=STEP_REVS_Z;
+  stepper_tos_100[2].current = 800;
+  stepper_tos_100[2].resistor = 150;
+  TMC26XStepper_init( &stepper_tos_100[2]);
 #endif
 
   // waveform generation = 0100 = CTC

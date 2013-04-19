@@ -75,16 +75,10 @@ tos100 stepper_tos_100[3];
 //debuging output
 //#define DEBUG
 
-void TMC26XStepper_init(int number_of_steps, int cs_pin,  unsigned int current, unsigned int resistor, tos100 *tos100)
+void TMC26XStepper_init( tos100 *tos100)
 {
   //by default cool step is not enabled
   tos100->cool_step_enabled=false;
-        
-  //save the pins for later use
-  tos100->cs_pin=cs_pin;
-    
-  //store the current sense resistor value for later use
-  tos100->resistor = resistor;
         
   //initialize register values
   tos100->driver_control_register_value=DRIVER_CONTROL_REGISTER | INITIAL_MICROSTEPPING;
@@ -103,11 +97,8 @@ void TMC26XStepper_init(int number_of_steps, int cs_pin,  unsigned int current, 
   //set to a conservative start value
   //TMC26XStepper_setConstantOffTimeChopper(7, 54, 13,12,1, tos100);
   //set a nice microstepping value, TOO: broken!
-  //TMC26XStepper_setMicrosteps(DEFAULT_MICROSTEPPING_VALUE, tos100);
+  //TMC26XStepper_setMicrosteps(tos100->microsteps, tos100);
   
-  //save the number of steps
-  tos100->number_of_steps = number_of_steps;
-
    TMC26XStepper_start(tos100);
 
    // after setup set pin to HIGH again
@@ -186,10 +177,10 @@ void TMC26XStepper_send262(unsigned long datagram, tos100 *tos100) {
   tos100->driver_status_result = i_datagram;
 }
 
-void TMC26XStepper_setCurrent(unsigned int current, tos100 *tos100) {
+void TMC26XStepper_setCurrent(tos100 *tos100) {
   unsigned char current_scaling = 0;
   //calculate the current scaling from the max current setting (in mA)
-  double mASetting = (double)current;
+  double mASetting = (double)tos100->current;
   double resistor_value = (double) tos100->resistor;
   // remove vesense flag
   tos100->driver_configuration_register_value &= ~(VSENSE); 
