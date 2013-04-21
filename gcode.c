@@ -255,10 +255,14 @@ uint8_t gc_execute_line(char *line)
     //  ([M6]: Tool change should be executed here.)
 
     // [M3,M4,M5]: Update spindle state
+#ifndef NO_SPINDLE_CONTROL
     spindle_run(gc.spindle_direction);
-  
+#endif
+
     // [*M7,M8,M9]: Update coolant state
+#ifndef NO_COOLANT_CONTROL
     coolant_run(gc.coolant_mode);
+#endif
   }
   
   // [G54,G55,...,G59]: Coordinate system selection

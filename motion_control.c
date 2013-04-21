@@ -270,9 +270,13 @@ void mc_reset()
   if (bit_isfalse(sys.execute, EXEC_RESET)) {
     sys.execute |= EXEC_RESET;
 
-    // Kill spindle and coolant.   
+    // Kill spindle and coolant.
+#ifndef NO_SPINDLE_CONTROL   
     spindle_stop();
+#endif
+#ifndef NO_COOLANT_CONTROL
     coolant_stop();
+#endif
 
     // Kill steppers only if in any motion state, i.e. cycle, feed hold, homing, or jogging
     // NOTE: If steppers are kept enabled via the step idle delay setting, this also keeps

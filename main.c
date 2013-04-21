@@ -65,8 +65,12 @@ int main(void)
       plan_init(); // Clear block buffer and planner variables
       gc_init(); // Set g-code parser to default state
       protocol_init(); // Clear incoming line data and execute startup lines
+#ifndef NO_SPINDLE_CONTROL
       spindle_init();
+#endif
+#ifndef NO_COOLANT_CONTROL
       coolant_init();
+#endif
       limits_init();
       st_reset(); // Clear stepper subsystem variables.
 
