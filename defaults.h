@@ -89,10 +89,10 @@
   // Description: Shapeoko CNC mill with three NEMA 17 stepper motors, driven by Synthetos
   // grblShield with a 24V, 4.2A power supply.
   #define MICROSTEPS_XY 8
-  #define STEP_REVS_XY 400
+  #define STEP_REVS_XY 200
   #define MM_PER_REV_XY (0.08*18*MM_PER_INCH) // 0.08 in belt pitch, 18 pulley teeth
   #define MICROSTEPS_Z 2
-  #define STEP_REVS_Z 400
+  #define STEP_REVS_Z 200
   #define MM_PER_REV_Z 1.250 // 1.25 mm/rev leadscrew
   #define DEFAULT_X_STEPS_PER_MM (MICROSTEPS_XY*STEP_REVS_XY/MM_PER_REV_XY)
   #define DEFAULT_Y_STEPS_PER_MM (MICROSTEPS_XY*STEP_REVS_XY/MM_PER_REV_XY)
